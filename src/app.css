@@ -1,0 +1,53 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --page-count: 20;
+  --page-scroll: 25;
+  --underline: hsla(0, 0%, 25%, 0.4);
+  --spine: hsl(0, 0%, 0%);
+  --cover: hsl(0, 0%, 10%);
+  --bg: hsl(0, 0%, 30%);
+  --insert: hsl(0, 0%, 85%);
+  --page: hsl(0, 0%, 90%);
+  --ink: hsl(0, 0%, 6%);
+  --muted: hsl(0, 0%, 62%);
+  --focus: hsl(196, 96%, 64%);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--bg);
+}
+
+a {
+  color: inherit;
+}
+
+a:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+img,
+svg {
+  display: block;
+}
