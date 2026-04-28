@@ -1,44 +1,24 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
   import { leaves, sketchPages, TOTAL_SCROLL_VH } from './bookData';
   import BookPage from './BookPage.svelte';
-  import { setupBookAnimation, type BookAnimation } from './gsapBook';
-
-  let container: HTMLElement;
-
-  onMount(() => {
-    let mounted = true;
-    let animation: BookAnimation | undefined;
-
-    tick().then(() => {
-      if (!mounted || !container) {
-        return;
-      }
-
-      animation = setupBookAnimation(container);
-      ScrollTrigger.refresh();
-    });
-
-    return () => {
-      mounted = false;
-      animation?.revert();
-    };
-  });
+  import { bookAnimation } from './gsapBook';
 </script>
 
 <main
   class="book-scene"
-  bind:this={container}
+  data-book-scene
+  {@attach bookAnimation}
   style:--total-scroll-vh={TOTAL_SCROLL_VH}
 >
   <h1 class="scroll-heading">Scroll</h1>
 
-  <div class="book" aria-label="Animated sketch book">
-    <div class="book__spine" aria-hidden="true"></div>
-    {#each leaves as leaf (leaf.id)}
-      <BookPage {leaf} />
-    {/each}
+  <div class="book-frame">
+    <div class="book" data-book aria-label="Animated sketch book">
+      <div class="book__spine" aria-hidden="true"></div>
+      {#each leaves as leaf (leaf.id)}
+        <BookPage {leaf} />
+      {/each}
+    </div>
   </div>
 
   <section class="book-fallback" aria-label="Sketch pages">
@@ -71,7 +51,7 @@
     pointer-events: none;
   }
 
-  .book {
+  .book-frame {
     width: 30vmin;
     height: 40vmin;
     min-width: 150px;
@@ -79,7 +59,14 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%);
+  }
+
+  .book {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform: scale(0.5);
     transform-style: preserve-3d;
     perspective: 1200px;
     will-change: transform;
@@ -103,7 +90,7 @@
   }
 
   @media (max-width: 700px) {
-    .book {
+    .book-frame {
       width: 42vmin;
       height: 56vmin;
     }
@@ -120,7 +107,7 @@
     }
 
     .scroll-heading,
-    .book {
+    .book-frame {
       display: none;
     }
 

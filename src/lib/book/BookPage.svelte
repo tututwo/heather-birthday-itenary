@@ -1,9 +1,7 @@
-<script lang="ts">
-  import { BEAR_LOGO_URL, type BookLeaf } from './bookData';
+<script module lang="ts">
+  import type { BookLeaf } from './bookData';
 
-  let { leaf }: { leaf: BookLeaf } = $props();
-
-  const coverCode = [
+  const COVER_CODE = [
     'const book = gsap.timeline({',
     '  scrollTrigger: { scrub: 1 }',
     '});',
@@ -24,6 +22,12 @@
   };
 </script>
 
+<script lang="ts">
+  import { BEAR_LOGO_URL } from './bookData';
+
+  let { leaf }: { leaf: BookLeaf } = $props();
+</script>
+
 <article
   class={[
     'page',
@@ -32,12 +36,13 @@
     leaf.variant === 'front-cover' && 'book__cover--front',
     leaf.variant === 'back-cover' && 'book__cover--back'
   ]}
+  data-book-page
   style:--page-index={leaf.pageIndex}
   aria-label={labelForLeaf(leaf)}
 >
   <div class="page__half page__half--front">
     {#if leaf.variant === 'front-cover'}
-      <span class="code" aria-hidden="true">{coverCode}</span>
+      <span class="code" aria-hidden="true">{COVER_CODE}</span>
       <img class="sticker" src={BEAR_LOGO_URL} alt="" aria-hidden="true" />
     {:else if leaf.front}
       <a class="page__media-link" href={leaf.front.href} target="_blank" rel="noreferrer noopener">
@@ -51,7 +56,7 @@
     {#if leaf.variant === 'front-cover'}
       <div class="book__insert" aria-hidden="true"></div>
     {:else if leaf.variant === 'back-cover'}
-      <span class="code" aria-hidden="true">{coverCode}</span>
+      <span class="code" aria-hidden="true">{COVER_CODE}</span>
     {:else if leaf.back}
       <a class="page__media-link" href={leaf.back.href} target="_blank" rel="noreferrer noopener">
         <img class="page__image" src={leaf.back.imageSrc} alt={leaf.back.imageAlt} />
@@ -63,7 +68,7 @@
   {#if leaf.variant === 'back-cover'}
     <div class="book__insert">
       <a class="logo-link" href="https://jhey.dev" target="_blank" rel="noopener noreferrer">
-        <img class="logo" src={BEAR_LOGO_URL} alt="Jhey bear logo" />
+        <img class="logo" data-book-logo src={BEAR_LOGO_URL} alt="Jhey bear logo" />
       </a>
     </div>
   {/if}
@@ -79,7 +84,7 @@
 
   .book__page {
     position: absolute;
-    top: 50%;
+    top: 0;
     left: 0;
     z-index: calc((var(--page-count) + 2 - var(--page-index)) * 2);
     transform-origin: 0% 50%;
