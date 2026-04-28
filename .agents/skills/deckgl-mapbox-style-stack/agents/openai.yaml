@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Deck.gl Mapbox Style Stack'
+  short_description: 'Place Deck.gl layers in Mapbox style order'
+  default_prompt: 'Use $deckgl-mapbox-style-stack to insert Deck.gl layers into a Mapbox style stack.'

@@ -1,0 +1,34 @@
+{
+	"skill_name": "deckgl-layer-visualization-patterns",
+	"evals": [
+		{
+			"id": 1,
+			"prompt": "I need a Deck.gl map overlay with job points, selected halos, and labels only for selected or high-scoring jobs. What layer structure should I use?",
+			"expectations": [
+				"Recommends separate halo, point, and TextLayer layers",
+				"Uses ScatterplotLayer for halos and points, TextLayer for labels",
+				"Makes only the point layer pickable",
+				"Filters label data to selected or high-priority rows"
+			]
+		},
+		{
+			"id": 2,
+			"prompt": "Build a typed Deck.gl layer factory for point data with click selection and a tooltip. What are the important TypeScript and safety patterns?",
+			"expectations": [
+				"Defines a typed row with coordinates as [longitude, latitude]",
+				"Uses generic layer constructors such as ScatterplotLayer<Row>",
+				"Returns a LayersList from a pure function",
+				"Escapes strings before returning tooltip html"
+			]
+		},
+		{
+			"id": 3,
+			"prompt": "Should I use GeoJsonLayer or ScatterplotLayer for a simple array of 2,000 point rows with custom selected styling?",
+			"expectations": [
+				"Recommends ScatterplotLayer for a simple array of points",
+				"Explains GeoJsonLayer is better when data is already GeoJSON or mixes points, lines, and polygons",
+				"Mentions stable ids, cheap accessors, and pickable only if interaction is needed"
+			]
+		}
+	]
+}

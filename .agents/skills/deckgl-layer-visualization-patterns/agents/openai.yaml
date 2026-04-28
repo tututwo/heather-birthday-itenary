@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Deck.gl Layer Visualization'
+  short_description: 'Build typed Deck.gl visualization layers'
+  default_prompt: 'Use $deckgl-layer-visualization-patterns to build typed Deck.gl visualization layers.'

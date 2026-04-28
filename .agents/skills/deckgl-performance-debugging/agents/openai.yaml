@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Deck.gl Performance Debugging'
+  short_description: 'Debug and optimize Deck.gl React layers'
+  default_prompt: 'Use $deckgl-performance-debugging to diagnose a slow or blank Deck.gl map.'

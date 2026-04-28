@@ -1,0 +1,34 @@
+{
+	"skill_name": "deckgl-react-mapbox-patterns",
+	"evals": [
+		{
+			"id": 1,
+			"prompt": "Review this React component. It creates a new MapboxOverlay in render and passes initialViewState plus controller to the overlay. What is wrong and what is the correct pattern?",
+			"expectations": [
+				"Identifies that MapboxOverlay should be created through react-map-gl useControl, not recreated in render",
+				"Explains that MapboxOverlay ignores or disallows deck.gl camera/controller props because Mapbox owns the camera",
+				"Shows the DeckOverlay helper pattern with useControl and overlay.setProps(props)",
+				"Mentions importing mapbox-gl/dist/mapbox-gl.css"
+			]
+		},
+		{
+			"id": 2,
+			"prompt": "I need Deck.gl points to render under Mapbox labels but above the land and water. Should I use interleaved, overlaid, or reverse-controlled mode?",
+			"expectations": [
+				"Recommends MapboxOverlay with interleaved: true",
+				"Explains that interleaving inserts deck.gl layers into the Mapbox style stack",
+				"Mentions beforeId for classic styles and slot for Mapbox v3 Standard styles",
+				"Does not recommend reverse-controlled mode for this style-ordering use case"
+			]
+		},
+		{
+			"id": 3,
+			"prompt": "In a React Mapbox app, when should I use DeckGL as the root instead of MapboxOverlay?",
+			"expectations": [
+				"Recommends DeckGL root only when deck.gl must own controllers, pointer input, custom views, or widgets",
+				"States that Mapbox controls/plugins are not available in reverse-controlled DeckGL-root mode",
+				"Recommends MapboxOverlay for normal React Mapbox apps that need Mapbox controls and camera ownership"
+			]
+		}
+	]
+}

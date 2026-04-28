@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Deck.gl React Mapbox Patterns'
+  short_description: 'Integrate Deck.gl with React Mapbox maps'
+  default_prompt: 'Use $deckgl-react-mapbox-patterns to add Deck.gl to a React Mapbox map.'

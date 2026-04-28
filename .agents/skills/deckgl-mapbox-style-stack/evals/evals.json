@@ -1,0 +1,34 @@
+{
+	"skill_name": "deckgl-mapbox-style-stack",
+	"evals": [
+		{
+			"id": 1,
+			"prompt": "I have a classic Mapbox Streets style and want my Deck.gl ScatterplotLayer to render below road and POI labels. What should I set?",
+			"expectations": [
+				"Recommends MapboxOverlay interleaved: true",
+				"Recommends finding a symbol/text label layer id from map.getStyle().layers",
+				"Sets the deck.gl layer beforeId to that label layer id",
+				"Explains that beforeId has no effect in non-interleaved mode"
+			]
+		},
+		{
+			"id": 2,
+			"prompt": "The app uses Mapbox v3 Standard Style. I tried beforeId but my Deck.gl layer placement is unreliable. What should I use?",
+			"expectations": [
+				"Recommends using deck.gl layer slot with Mapbox v3 Standard Style",
+				"Mentions slot values such as bottom, middle, or top",
+				"Explains that Standard Style slots are preferred over brittle layer ids"
+			]
+		},
+		{
+			"id": 3,
+			"prompt": "I have Deck.gl halo, point, and text layers for selected map items. What order should they be in?",
+			"expectations": [
+				"Places halo below points",
+				"Places points above halos and makes points pickable",
+				"Places labels above points when labels are app-owned foreground context",
+				"Mentions selected or active content can render above less-important base labels when needed"
+			]
+		}
+	]
+}

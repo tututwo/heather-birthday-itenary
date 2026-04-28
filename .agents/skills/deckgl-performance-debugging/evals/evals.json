@@ -1,0 +1,34 @@
+{
+	"skill_name": "deckgl-performance-debugging",
+	"evals": [
+		{
+			"id": 1,
+			"prompt": "My Deck.gl ScatterplotLayer is blank on a React Mapbox map. The map loads. What should I check first?",
+			"expectations": [
+				"Checks container size, Mapbox CSS, token, camera position, and coordinate order",
+				"Checks layer color alpha, radius units, visibility, and accessor return values",
+				"Checks beforeId or slot if the layer is interleaved",
+				"Recommends browser console inspection for WebGL, CORS, worker, or token errors"
+			]
+		},
+		{
+			"id": 2,
+			"prompt": "My Deck.gl layer stutters whenever a React filter slider moves. I call data.filter inside the layer constructor on every render. What's the fix?",
+			"expectations": [
+				"Identifies unstable data identity as the cause of buffer regeneration",
+				"Recommends memoizing filtered data with useMemo",
+				"Recommends keeping layer construction pure and optionally memoized",
+				"Mentions updateTriggers only when source data remains stable and accessor output changes"
+			]
+		},
+		{
+			"id": 3,
+			"prompt": "I toggle a Deck.gl label layer on and off frequently by conditionally including it in the layers array. The first toggle back on is slow. What should I change?",
+			"expectations": [
+				"Recommends keeping the layer in the array and toggling visible",
+				"Explains that removing and readding layers loses internal GPU resources",
+				"Mentions stable layer ids and retained layer state"
+			]
+		}
+	]
+}
