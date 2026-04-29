@@ -1,32 +1,51 @@
 <script module lang="ts">
-  import type { BookLeaf } from './bookData';
+  import type { BookLeaf, PageFace } from './bookData';
 
-  const COVER_CODE = [
-    'const book = gsap.timeline({',
-    '  scrollTrigger: { scrub: 1 }',
-    '});',
-    'book.to(page, { rotateY: -180 });',
-    'ScrollTrigger.refresh();'
-  ].join('\n');
+  const labelForFace = (face: PageFace | undefined) => {
+    if (!face) {
+      return '';
+    }
+
+    if (face.kind === 'cover') {
+      return face.title;
+    }
+
+    return `Stop ${face.spreadId.replace('stop-', '')} ${face.side} page`;
+  };
 
   const labelForLeaf = (currentLeaf: BookLeaf) => {
     if (currentLeaf.variant === 'front-cover') {
-      return 'Front cover';
+      return 'Front cover and first itinerary page';
     }
 
     if (currentLeaf.variant === 'back-cover') {
-      return 'Back cover';
+      return 'Final itinerary page and back cover';
     }
 
-    return `Pages ${currentLeaf.front?.number ?? ''} and ${currentLeaf.back?.number ?? ''}`;
+    return [labelForFace(currentLeaf.front), labelForFace(currentLeaf.back)]
+      .filter(Boolean)
+      .join(' and ');
   };
 </script>
 
 <script lang="ts">
-  import { BEAR_LOGO_URL } from './bookData';
+  import CoverFace from './CoverFace.svelte';
 
   let { leaf }: { leaf: BookLeaf } = $props();
 </script>
+
+{#snippet pageFace(face: PageFace | undefined)}
+  {#if face?.kind === 'storyboard'}
+    <img
+      class="page__image page__image--storyboard"
+      src={face.imageSrc}
+      alt={face.imageAlt}
+      style:--storyboard-position={face.objectPosition}
+    />
+  {:else if face?.kind === 'cover'}
+    <CoverFace {face} />
+  {/if}
+{/snippet}
 
 <article
   class={[
@@ -41,37 +60,12 @@
   aria-label={labelForLeaf(leaf)}
 >
   <div class="page__half page__half--front">
-    {#if leaf.variant === 'front-cover'}
-      <span class="code" aria-hidden="true">{COVER_CODE}</span>
-      <img class="sticker" src={BEAR_LOGO_URL} alt="" aria-hidden="true" />
-    {:else if leaf.front}
-      <a class="page__media-link" href={leaf.front.href} target="_blank" rel="noreferrer noopener">
-        <img class="page__image" src={leaf.front.imageSrc} alt={leaf.front.imageAlt} />
-      </a>
-      <span class="page__number">{leaf.front.number}</span>
-    {/if}
+    {@render pageFace(leaf.front)}
   </div>
 
   <div class="page__half page__half--back">
-    {#if leaf.variant === 'front-cover'}
-      <div class="book__insert" aria-hidden="true"></div>
-    {:else if leaf.variant === 'back-cover'}
-      <span class="code" aria-hidden="true">{COVER_CODE}</span>
-    {:else if leaf.back}
-      <a class="page__media-link" href={leaf.back.href} target="_blank" rel="noreferrer noopener">
-        <img class="page__image" src={leaf.back.imageSrc} alt={leaf.back.imageAlt} />
-      </a>
-      <span class="page__number">{leaf.back.number}</span>
-    {/if}
+    {@render pageFace(leaf.back)}
   </div>
-
-  {#if leaf.variant === 'back-cover'}
-    <div class="book__insert">
-      <a class="logo-link" href="https://jhey.dev" target="_blank" rel="noopener noreferrer">
-        <img class="logo" data-book-logo src={BEAR_LOGO_URL} alt="Jhey bear logo" />
-      </a>
-    </div>
-  {/if}
 </article>
 
 <style>
@@ -136,112 +130,20 @@
   .book__cover {
     width: 100%;
     height: 100%;
-    color: hsl(0, 0%, 96%);
   }
 
   .book__cover .page__half {
     background: var(--cover);
   }
 
-  .book__cover--front .page__half--back {
-    border-right: 1rem solid var(--spine);
-  }
-
-  .book__cover--back .page__half--front {
-    border-left: 1rem solid var(--spine);
-  }
-
-  .book__insert {
-    width: 94%;
-    height: 94%;
-    position: absolute;
-    top: 50%;
-    right: -1rem;
-    background: var(--insert);
-    border-radius: 5% 0 0 5%;
-    transform: translateY(-50%);
-  }
-
-  .book__cover--back .book__insert {
-    right: auto;
-    left: 0;
-    border-radius: 0 5% 5% 0;
-  }
-
-  .page__media-link {
-    width: 100%;
-    height: 100%;
-    display: block;
-    position: relative;
-  }
-
   .page__image {
-    width: 90%;
-    height: 90%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 2;
-    object-fit: contain;
-    transform: translate(-50%, -50%);
-  }
-
-  .page__number {
-    position: absolute;
-    bottom: 1rem;
-    color: hsl(0, 0%, 50%);
-    font-size: max(0.625rem, 1vmin);
-    font-weight: 700;
-  }
-
-  .page__half--front .page__number {
-    right: 1rem;
-  }
-
-  .page__half--back .page__number {
-    left: 1rem;
-  }
-
-  .code {
-    max-width: 84%;
-    max-height: 76%;
-    display: block;
-    overflow: hidden;
-    color: hsl(0, 0%, 96%);
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-    font-size: clamp(0.45rem, 1.4vmin, 0.85rem);
-    font-weight: 700;
-    line-height: 1.25;
-    white-space: pre-line;
-    opacity: 0.82;
-  }
-
-  .sticker {
-    width: auto;
-    height: 15%;
-    position: absolute;
-    right: 6%;
-    bottom: 5%;
-    filter: drop-shadow(0 0.2rem 0.25rem hsla(0, 0%, 0%, 0.35));
-    transform: rotate(-25deg);
-  }
-
-  .logo-link {
-    width: 28%;
-    height: 28%;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    display: block;
-    transform: translate(-50%, -50%);
-  }
-
-  .logo {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    opacity: 0;
-    visibility: hidden;
-    will-change: opacity;
+    display: block;
+  }
+
+  .page__image--storyboard {
+    object-fit: cover;
+    object-position: var(--storyboard-position);
   }
 </style>

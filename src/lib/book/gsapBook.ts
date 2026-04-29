@@ -9,18 +9,18 @@ const SCALE_START = 0;
 const SCALE_END = 1;
 const SHIFT_START = 1;
 const SHIFT_END = 2;
-const LOGO_REVEAL_START = 13.5;
-const LOGO_REVEAL_END = 14;
 
 const BOOK_SELECTOR = '[data-book]';
-const LOGO_SELECTOR = '[data-book-logo]';
 const PAGE_SELECTOR = '[data-book-page]';
 
 const scrollUnit = () => window.innerHeight * SCROLL_UNIT_RATIO;
 const scrollPosition = (unit: number) => unit * scrollUnit();
 const pageFlipStart = (index: number) => index + 1;
-const initialPageDepth = (index: number) => (index === 0 ? 13 : -index);
-const finalPageDepth = (index: number) => (index === 0 ? -13 : index);
+const timelineEnd = (pages: HTMLElement[]) => Math.max(pages.length, SHIFT_END);
+const initialPageDepth = (index: number, pageCount: number) =>
+  index === 0 ? pageCount + 1 : -index;
+const finalPageDepth = (index: number, pageCount: number) =>
+  index === 0 ? -(pageCount + 1) : index;
 const pageRotation = (index: number) => `-=${180 - index / 2}`;
 
 type MatchMediaConditions = {
@@ -31,34 +31,23 @@ export type BookAnimation = {
   revert: () => void;
 };
 
-const applyReducedMotionState = (
-  book: HTMLElement,
-  pages: HTMLElement[],
-  logo: HTMLElement | null
-) => {
+const applyReducedMotionState = (book: HTMLElement, pages: HTMLElement[]) => {
   gsap.set(book, { scale: 1, x: () => book.offsetWidth / 2 });
   gsap.set(pages, { rotateY: 0, z: 0 });
-
-  if (logo) {
-    gsap.set(logo, { autoAlpha: 1 });
-  }
 };
 
 const createBookTimeline = (
   root: HTMLElement,
   book: HTMLElement,
-  pages: HTMLElement[],
-  logo: HTMLElement | null
+  pages: HTMLElement[]
 ) => {
+  const pageCount = pages.length;
+
   gsap.set(book, { scale: 0.5, x: 0 });
   gsap.set(pages, {
     rotateY: 0,
-    z: (index) => initialPageDepth(index)
+    z: (index) => initialPageDepth(index, pageCount)
   });
-
-  if (logo) {
-    gsap.set(logo, { autoAlpha: 0 });
-  }
 
   const timeline = gsap.timeline({
     defaults: { ease: 'none' },
@@ -66,7 +55,7 @@ const createBookTimeline = (
       trigger: root,
       scrub: 1,
       start: 0,
-      end: () => scrollPosition(LOGO_REVEAL_END),
+      end: () => scrollPosition(timelineEnd(pages)),
       invalidateOnRefresh: true
     }
   });
@@ -86,7 +75,7 @@ const createBookTimeline = (
     const flipStart = pageFlipStart(index);
     const isBackCover = index === pages.length - 1;
 
-    timeline.set(page, { z: initialPageDepth(index) }, SCALE_START);
+    timeline.set(page, { z: initialPageDepth(index, pageCount) }, SCALE_START);
 
     if (isBackCover) {
       return;
@@ -95,19 +84,8 @@ const createBookTimeline = (
     timeline
       .addLabel(`page-${index + 1}`, flipStart)
       .to(page, { rotateY: pageRotation(index), duration: 1 }, flipStart)
-      .to(page, { z: finalPageDepth(index), duration: 0.5 }, flipStart);
+      .to(page, { z: finalPageDepth(index, pageCount), duration: 0.5 }, flipStart);
   });
-
-  if (logo) {
-    timeline
-      .addLabel('logo-reveal', LOGO_REVEAL_START)
-      .fromTo(
-        logo,
-        { autoAlpha: 0 },
-        { autoAlpha: 1, duration: LOGO_REVEAL_END - LOGO_REVEAL_START },
-        'logo-reveal'
-      );
-  }
 
   return timeline;
 };
@@ -117,7 +95,6 @@ export function setupBookAnimation(root: HTMLElement): BookAnimation {
 
   const ctx = gsap.context(() => {
     const book = root.querySelector<HTMLElement>(BOOK_SELECTOR);
-    const logo = root.querySelector<HTMLElement>(LOGO_SELECTOR);
     const pages = gsap.utils.toArray<HTMLElement>(PAGE_SELECTOR, root);
 
     if (!book) {
@@ -134,11 +111,11 @@ export function setupBookAnimation(root: HTMLElement): BookAnimation {
         const conditions = context.conditions as MatchMediaConditions;
 
         if (conditions.reduceMotion) {
-          applyReducedMotionState(book, pages, logo);
+          applyReducedMotionState(book, pages);
           return;
         }
 
-        createBookTimeline(root, book, pages, logo);
+        createBookTimeline(root, book, pages);
       },
       root
     );
